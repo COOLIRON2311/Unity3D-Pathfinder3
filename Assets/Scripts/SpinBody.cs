@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //  Скрипт для вращения тела игрока в горизонтальной плоскости (вокруг оси Y)
-public class spin_body : MonoBehaviour
+public class SpinBody : MonoBehaviour
 {
     //  Скорость вращения (аналог чувствительности мыши)
-    public float sensitivityHoriz = 9.0f;
-    
+    public float sensitivityHorizontal = 9.0f;
+
     //  Текущий угол поворота - он запоминается, хотя можно обойтись и без него
     private float _rotationY = 0;
 
@@ -17,7 +17,7 @@ public class spin_body : MonoBehaviour
     // Каждый раз при обновлении считываем позицию курсора мыши, и соответственно выполняем вращение
     void Update()
     {
-        _rotationY += Input.GetAxis("Mouse X") * sensitivityHoriz;
+        _rotationY += Input.GetAxis("Mouse X") * sensitivityHorizontal;
 
         //GetComponent<Rigidbody>().isKinematic = false;
         //transform.localEulerAngles = new Vector3(0, _rotationY, 0);

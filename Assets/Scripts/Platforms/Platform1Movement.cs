@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Platform1Movement : MonoBehaviour, BaseAI.IBaseRegion
 {
-    private Vector3 initialPosisition;
+    private Vector3 initialPosition;
     [SerializeField] private bool moving;
     private Vector3 rotationCenter;
     private Vector3 rotationStartPos;
@@ -22,7 +22,7 @@ public class Platform1Movement : MonoBehaviour, BaseAI.IBaseRegion
     public int index { get; set; } = -1;
     bool IBaseRegion.Dynamic { get; } = true;
 
-    public IList<BaseAI.IBaseRegion> Neighbors { get; set; } = new List<BaseAI.IBaseRegion>();
+    public IList<IBaseRegion> Neighbors { get; set; } = new List<IBaseRegion>();
 
     void Start()
     {
@@ -38,7 +38,7 @@ public class Platform1Movement : MonoBehaviour, BaseAI.IBaseRegion
     }
 
     void IBaseRegion.TransformPoint(PathNode parent, PathNode node) {
-        
+
         float timeDelta = node.TimeMoment - parent.TimeMoment;
 
         Vector3 dir = node.Position - rotationCenter;
@@ -47,7 +47,7 @@ public class Platform1Movement : MonoBehaviour, BaseAI.IBaseRegion
         return;
     }
 
-    void IBaseRegion.TransformGlobalToLocal(PathNode node) 
+    void IBaseRegion.TransformGlobalToLocal(PathNode node)
     {
         //  Вот тут всё плохо - определяем момент времени, через который нам нужна точка
         float timeDelta = node.TimeMoment - Time.time;
@@ -83,7 +83,7 @@ public class Platform1Movement : MonoBehaviour, BaseAI.IBaseRegion
 
     float IBaseRegion.SqrDistanceTo(PathNode node)
     {
-        //  Вот тоже должно быть странно - как-то надо узнать, эта точка вообще попадает в коллайдер, 
+        //  Вот тоже должно быть странно - как-то надо узнать, эта точка вообще попадает в коллайдер,
         //  и если попадает, то когда? Может, тупо до центра области сделать? Сойдёт же!
         throw new System.NotImplementedException();
     }

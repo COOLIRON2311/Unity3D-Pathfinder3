@@ -33,7 +33,7 @@ namespace BaseAI
         private int obstaclesLayerMask;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private float rayRadius;
 
@@ -62,7 +62,7 @@ namespace BaseAI
                 {
                     node.RegionIndex = currentRegion.index;
                 }
-                else 
+                else
                     return false;  //  Не принадлежит ни целевому, ни рабочему
 
             //  Следующая проверка - на то, что над поверхностью расстояние не слишком большое
@@ -78,17 +78,17 @@ namespace BaseAI
             //  Ну и осталось проверить препятствия - для движущихся не сработает такая штука, потому что проверка выполняется для
             //  момента времени в будущем.
             //  Но из этой штуки теоретически можно сделать и для перемещающихся препятствий работу - надо будет перемещающиеся
-            //  заворачивать в отдельный 
+            //  заворачивать в отдельный
 
             //if (node.Parent != null && Physics.CheckSphere(node.Position, 2.0f, obstaclesLayerMask))
             //if (node.Parent != null && Physics.Linecast(node.Parent.Position, node.Position, obstaclesLayerMask))
             if (node.Parent != null && Physics.CheckSphere(node.Position, 1.0f, obstaclesLayerMask))
                 return false;
-            
+
             return true;
         }
 
-        private static float Heur(PathNode node, PathNode target, MovementProperties properties)
+        private static float Heuristic(PathNode node, PathNode target, MovementProperties properties)
         {
             //  Эвристику переделать - сейчас учитываются уже затраченное время, оставшееся до цели время и угол поворота
             float angle = Mathf.Abs(Vector3.Angle(node.Direction, target.Position - node.Position)) / properties.rotationAngle;
@@ -109,7 +109,7 @@ namespace BaseAI
 
             float step = properties.deltaTime * properties.maxSpeed;
 
-            List<PathNode> result = new List<PathNode>();
+            List<PathNode> result = new();
 
             //  Сначала прыжок проверяем, и если он возможен, то на этом и закончим
             //  Прыжок должен допускаться только между регионами с разными признаками динамичности
@@ -133,11 +133,11 @@ namespace BaseAI
 
             //  А в обычные маршруты прыжки не попадают
             //  Внешний цикл отвечает за длину шага - либо 0 (остаёмся в точке), либо 1 - шагаем вперёд
-            for (int mult = 0; mult <= 1; ++mult)
+            for (int mul = 0; mul <= 1; ++mul)
                 //  Внутренний цикл перебирает углы поворота
                 for (int angleStep = -properties.angleSteps; angleStep <= properties.angleSteps; ++angleStep)
                 {
-                    PathNode next = node.SpawnChild(step * mult, angleStep * properties.rotationAngle, properties.deltaTime);
+                    PathNode next = node.SpawnChild(step * mul, angleStep * properties.rotationAngle, properties.deltaTime);
 
                     //  Точка передаётся по ссылке, т.к. возможно обновление региона, которому она принадлежит
                     if (CheckWalkable(ref next, currentRegion, targetRegion))
@@ -191,15 +191,17 @@ namespace BaseAI
                 return -1f;
             }
 
-            Priority_Queue.SimplePriorityQueue<PathNode> opened = new Priority_Queue.SimplePriorityQueue<PathNode>();
+            Priority_Queue.SimplePriorityQueue<PathNode> opened = new();
 
             //  Тут тоже вопрос - а почему с 0 добавляем? Хотя она же сразу извлекается из очереди, не важно
             opened.Enqueue(start, 0);
             int steps = 0;
 
             //  Посещенные узлы (с некоторым шагом, аналог сетки)
-            HashSet<(int, int, int, int)> closed = new HashSet<(int, int, int, int)>();
-            closed.Add(start.ToGrid4DPoint(movementProperties.deltaDist, movementProperties.deltaTime));
+            HashSet<(int, int, int, int)> closed = new()
+            {
+                start.ToGrid4DPoint(movementProperties.deltaDist, movementProperties.deltaTime)
+            };
 
             PathNode current = opened.First;
             float largestTime = 0;
@@ -243,7 +245,7 @@ namespace BaseAI
                     var discreteNode = nextNode.ToGrid4DPoint(movementProperties.deltaDist, movementProperties.deltaTime);
                     if (!closed.Contains(discreteNode))
                     {
-                        nextNode.H = Heur(nextNode, target, movementProperties);
+                        nextNode.H = Heuristic(nextNode, target, movementProperties);
                         opened.Enqueue(nextNode, nextNode.H);
                         closed.Add(discreteNode);
                     }
@@ -252,7 +254,7 @@ namespace BaseAI
 
             if (finishPredicate(current, target) == false)
             {
-                
+
 
                 Debug.Log("Largest time : " + largestTime);
                 Debug.Log("Failed to build a way. Steps : " + steps.ToString());
@@ -260,13 +262,13 @@ namespace BaseAI
                 return -1f;
             }
 
-            List<PathNode> result = new List<PathNode>();
+            List<PathNode> result = new();
 
             //  Восстанавливаем путь от целевой к стартовой
             //  Может, заменить последнюю на целевую, с той же отметкой по времени? Но тогда с поворотом сложновато получается
             while (current != null)
             {
-                if(current.Parent != null) 
+                if(current.Parent != null)
                     Debug.DrawLine(current.Position, current.Parent.Position, Color.red, 20f);
                 result.Add(current);
                 current = current.Parent;
@@ -277,38 +279,38 @@ namespace BaseAI
             //  С точки зрения производительности это лучше делать в процессе движения бота, т.к. затраты размазываются
             //  на каждый кадр.
             //  Как-то так
-            for (var i = 0; i < result.Count; ++i) 
+            for (var i = 0; i < result.Count; ++i)
             {
                 if (cartographer.regions[result[i].RegionIndex].Dynamic)
                     cartographer.regions[result[i].RegionIndex].TransformGlobalToLocal(result[i]);
             }
 
-            if (result.Count > 0 && cartographer.IsInRegion(result[result.Count - 1], targetRegionIndex))
-                result[result.Count - 1].RegionIndex = targetRegionIndex;
+            if (result.Count > 0 && cartographer.IsInRegion(result[^1], targetRegionIndex))
+                result[^1].RegionIndex = targetRegionIndex;
 
             //  Обновляем результат у бота
             updater(result);
 
-            Debug.Log("Финальная точка маршрута : " + result[result.Count-1].Position.ToString() + "; target : " + target.Position.ToString());
-            return result[result.Count - 1].TimeMoment - result[0].TimeMoment;
+            Debug.Log("Финальная точка маршрута : " + result[^1].Position.ToString() + "; target : " + target.Position.ToString());
+            return result[^1].TimeMoment - result[0].TimeMoment;
 
         }
 
         /// <summary>
-        /// Основной метод поиска пути, запускает работу в отдельном потоке. Аккуратно с асинхронностью - мало ли, вроде бы 
+        /// Основной метод поиска пути, запускает работу в отдельном потоке. Аккуратно с асинхронностью - мало ли, вроде бы
         /// потокобезопасен, т.к. не изменяет данные о регионах сценах и прочем - работает как ReadOnly
         /// </summary>
         /// <returns></returns>
         public bool BuildRoute(PathNode start, PathNode finish, MovementProperties movementProperties, UpdatePathListDelegate updater)
         {
-            /*  Эта функция выполняет построение глобального пути. Её задача - определить, находятся ли 
+            /*  Эта функция выполняет построение глобального пути. Её задача - определить, находятся ли
              *  начальная и целевая точка в одном регионе. Если да, то просто запустить локальный
              *  маршрутизатор и построить маршрут в этом регионе.
              *  Иначе, если регионы разные - найти кратчайший маршрут между регионами (это задача
-             *  глобального планировщика, и он должен вернуть регион, соседний с текущим – это регион, 
+             *  глобального планировщика, и он должен вернуть регион, соседний с текущим – это регион,
              *  в который должны шагнуть. После этого необходимо использовать другой вариант функции поиска пути - с другой эвристикой, в качестве которой можно использовать расстояние до центральной точки целевого региона, и другой функций проверки целевого состояния, вместо близости к некоторой точке надо проверять, достигли ли мы целевого региона. А кто умеет лямбды в C#?
              *  В целом тут можно банально использовать алгоритм Дейкстры. Можно немного усложнить, проверяя
-             *  расстояние до границ текущего региона, и как-то до цели, но это уже улучшения. Вообще до 
+             *  расстояние до границ текущего региона, и как-то до цели, но это уже улучшения. Вообще до
              *  bounds можно это самое расстояние считать как-то. В базовой версии никаких особых извращений не нужно. Можно, конечно, и не Дейкстру, ну или модифицировать его немного.
             */
 
@@ -325,7 +327,7 @@ namespace BaseAI
             }
             else
                 startRegion = cartographer.regions[start.RegionIndex];
-            
+
             IBaseRegion finishRegion = cartographer.GetRegion(finish);
             finish.RegionIndex = finishRegion.index;
 
@@ -341,7 +343,7 @@ namespace BaseAI
                 }
                 finishRegion = cartographer.regions[finish.RegionIndex];
                 //  Конец блока глобального планировщика
-                PathNode targetPoint = new PathNode(finishRegion.GetCenter(), Vector3.zero);
+                PathNode targetPoint = new(finishRegion.GetCenter(), Vector3.zero);
                 Debug.Log("Going from " + start.RegionIndex.ToString() + " to " + finish.RegionIndex);
                 FindPath(start, targetPoint, finish.RegionIndex, movementProperties, updater, (curPathNode, finPathNode) => cartographer.IsInRegion(curPathNode, finish.RegionIndex) );
                 return true;

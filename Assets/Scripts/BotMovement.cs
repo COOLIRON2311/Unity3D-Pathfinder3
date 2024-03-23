@@ -33,12 +33,12 @@ public class BotMovement : MonoBehaviour
     /// Целевая точка для движения - глобальная цель
     /// </summary>
     [SerializeField] private GameObject finish;           //  Конечная цель маршрута как Vector3
-    private BaseAI.PathNode FinishPoint;                  //  Конечная цель маршрута как PathNode - вот оно нафига вообще?
+    private BaseAI.PathNode FinishPoint;                  //  Конечная цель маршрута как PathNode - вот оно зачем вообще?
     const int MinimumPathNodesLeft = 10;                  //  Минимальное число оставшихся точек в маршруте, при котором вызывается перестроение
 
     /// <summary>
-    /// Было ли запрошено обновление пути. Оно в отдельном потоке выполняется, поэтому если пути нет, но 
-    /// запрос планировщику подали, то надо просто ждать. В тяжелых случаях можно сделать отметку времени - когда был 
+    /// Было ли запрошено обновление пути. Оно в отдельном потоке выполняется, поэтому если пути нет, но
+    /// запрос планировщику подали, то надо просто ждать. В тяжелых случаях можно сделать отметку времени - когда был
     /// сделан запрос, и по прошествию слишком большого времени выбрасывать исключение.
     /// </summary>
     private bool pathUpdateRequested = false;
@@ -50,7 +50,7 @@ public class BotMovement : MonoBehaviour
     /// <summary>
     /// Находимся ли в полёте (в состоянии прыжка)
     /// </summary>
-    private bool isJumpimg;
+    private bool isJumping;
     private float jumpTestTime;
     /// <summary>
     /// Время предыдущего обращения к планировщику - не более одного раза в три секунды
@@ -147,13 +147,13 @@ public class BotMovement : MonoBehaviour
         if (currentTarget != null)
             startOfRoute = currentTarget;
         else
-            //  Из начального положения начнём - вот только со временем беда. Технически надо бы брать момент в будущем, когда 
+            //  Из начального положения начнём - вот только со временем беда. Технически надо бы брать момент в будущем, когда
             //  начнём движение, но мы не знаем когда маршрут построится. Надеемся, что быстро
             startOfRoute = new BaseAI.PathNode(transform.position, transform.forward);
         pathUpdateRequested = true;
         lastPathfinderRequest = Time.fixedTime;
         GlobalPathfinder.BuildRoute(startOfRoute, FinishPoint, movementProperties, UpdatePathListDelegate);
-        
+
         return true;
     }
 
@@ -177,12 +177,12 @@ public class BotMovement : MonoBehaviour
                 return true;
             }
             else
-            {                
+            {
                 //  А вот тут надо будет проверять, есть ли уже построенный маршрут
                 currentPath = null;
                 RequestPathfinder();
                 currentTarget = null;
-                
+
                 Debug.Log("Запрошено построение маршрута");
             }
         }
@@ -231,9 +231,9 @@ public class BotMovement : MonoBehaviour
             var rb = GetComponent<Rigidbody>();
             //  Сбрасываем скорость перед прыжком
             rb.velocity = Vector3.zero;
-            if (isJumpimg)
+            if (isJumping)
             {
-                isJumpimg = false;
+                isJumping = false;
                 Debug.Log("Jump time : " + (Time.time - jumpTestTime).ToString());
             }
         }
@@ -245,7 +245,7 @@ public class BotMovement : MonoBehaviour
     /// <returns></returns>
     bool CheckJumping()
     {
-        if (isJumpimg)
+        if (isJumping)
         {
             var a = leftLeg.GetComponent<MeshRenderer>();
             a.material.color = Color.red;
@@ -271,7 +271,7 @@ public class BotMovement : MonoBehaviour
         var jump = transform.forward + 2 * transform.up;
         float jumpForce = movementProperties.jumpForce;
         rb.AddForce(jump * jumpForce, ForceMode.Impulse);
-        isJumpimg = true;
+        isJumping = true;
 
         jumpTestTime = Time.time;
     }
@@ -282,7 +282,7 @@ public class BotMovement : MonoBehaviour
     /// <returns></returns>
     bool TryToJump()
     {
-        if (isJumpimg == true) return false;
+        if (isJumping == true) return false;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -309,7 +309,7 @@ public class BotMovement : MonoBehaviour
         if (TryToJump()) return true;
 
         //  Ну у нас тут точно есть целевая точка, вот в неё и пойдём
-        
+
         //  Сначала нужно обработать прыжок, если он требуется
         if(currentTarget.JumpNode)
         {

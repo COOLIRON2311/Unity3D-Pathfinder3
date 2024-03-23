@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// По-хорошему это октодерево должно быть, но неохота.
-/// Класс, владеющий полной информацией о сцене - какие области где расположены, 
+/// Класс, владеющий полной информацией о сцене - какие области где расположены,
 /// как связаны между собой, и прочая информация.
 /// Должен по координатам точки определять номер области.
 /// </summary>
@@ -25,19 +25,19 @@ namespace BaseAI
         /// Список соседних регионов (в которые можно перейти из этого)
         /// </summary>
         IList<IBaseRegion> Neighbors { get; set; }
-        
+
         /// <summary>
         /// Принадлежит ли точка региону (с учётом времени)
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         bool Contains(PathNode node);
-        
+
         /// <summary>
         /// Является ли регион динамическим
         /// </summary>
         bool Dynamic { get; }
-        
+
         /// <summary>
         /// Обе точки в глобальных координатах, но находятся в перемещающемся регионе.
         /// Эта функция добавляет в node смещение, обеспечиваемое движением самого региона.
@@ -67,14 +67,14 @@ namespace BaseAI
         void AddTransferTime(IBaseRegion source, IBaseRegion dest);
 
         /// <summary>
-        /// Время перехода через область насквозь, от одного до другого 
+        /// Время перехода через область насквозь, от одного до другого
         /// </summary>
         /// <param name="source">Регион, с границы которого стартуем</param>
         /// <param name="transitStart">Глобальное время начала перехода</param>
         /// <param name="dest">Регион назначения - ближайшая точка</param>
         /// <returns>Глобальное время появления в целевом регионе</returns>
         float TransferTime(IBaseRegion source, float transitStart, IBaseRegion dest);
-        
+
         /// <summary>
         /// Центральная точка региона - используется для марштуризации
         /// </summary>
@@ -91,7 +91,7 @@ namespace BaseAI
         /// Тело региона - коллайдер
         /// </summary>
         public SphereCollider body;
-        
+
         /// <summary>
         /// Расстояние транзита через регион
         /// </summary>
@@ -129,17 +129,18 @@ namespace BaseAI
         public bool Contains(PathNode node) { return body.bounds.Contains(node.Position); }
 
         /// <summary>
-        /// Время перехода через область насквозь, от одного до другого 
+        /// Время перехода через область насквозь, от одного до другого
         /// </summary>
         /// <param name="source">Регион, с границы которого стартуем</param>
         /// <param name="transitStart">Глобальное время начала перехода</param>
         /// <param name="dest">Регион назначения - ближайшая точка</param>
         /// <returns>Глобальное время появления в целевом регионе</returns>
-        public float TransferTime(IBaseRegion source, float transitStart, IBaseRegion dest) {
+        public float TransferTime(IBaseRegion source, float transitStart, IBaseRegion dest)
+        {
             throw new System.NotImplementedException();
         }
 
-        public Vector3 GetCenter() 
+        public Vector3 GetCenter()
         {
             //  Вроде бы должно работать
             return body.bounds.center;
@@ -150,7 +151,7 @@ namespace BaseAI
             throw new System.NotImplementedException();
         }
     }
-    
+
     /// <summary>
     /// Сферический регион на основе BoxCollider
     /// </summary>
@@ -160,17 +161,17 @@ namespace BaseAI
         /// Тело коллайдера для представления региона
         /// </summary>
         public BoxCollider body;
-        
+
         /// <summary>
         /// Индекс региона в списке регионов
         /// </summary>
         public int index { get; set; } = -1;
-        
+
         bool IBaseRegion.Dynamic { get; } = false;
         void IBaseRegion.TransformPoint(PathNode parent, PathNode node) { return; }
         void IBaseRegion.TransformGlobalToLocal(PathNode node) { /*ничего не делаем - регион статический*/}
         public IList<IBaseRegion> Neighbors { get; set; } = new List<IBaseRegion>();
-        
+
         /// <summary>
         /// Создание региона с кубическим коллайдером в качестве основы
         /// </summary>
@@ -181,23 +182,23 @@ namespace BaseAI
         {
             body = sample;
         }
-        
+
         /// <summary>
         /// Квадрат расстояния до региона (минимально расстояние до границ коллайдера в квадрате)
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         public float SqrDistanceTo(PathNode node) { return body.bounds.SqrDistance(node.Position); }
-        
+
         /// <summary>
         /// Проверка принадлежности точки региону
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         public bool Contains(PathNode node) { return body.bounds.Contains(node.Position); }
-        
+
         /// <summary>
-        /// Время перехода через область насквозь, от одного до другого 
+        /// Время перехода через область насквозь, от одного до другого
         /// </summary>
         /// <param name="source">Регион, с границы которого стартуем</param>
         /// <param name="transitStart">Глобальное время начала перехода</param>
@@ -223,7 +224,7 @@ namespace BaseAI
     public class Cartographer
     {
         //  Список регионов
-        public List<IBaseRegion> regions = new List<IBaseRegion>();
+        public List<IBaseRegion> regions = new();
 
         //  Поверхность (Terrain) сцены
         public Terrain SceneTerrain;
@@ -252,7 +253,8 @@ namespace BaseAI
             var colliders = collidersCollection.GetComponents<Collider>();
             foreach (var collider in colliders)
             {
-                if (collider.GetType() == typeof(BoxCollider)) {
+                if (collider.GetType() == typeof(BoxCollider))
+                {
                     regions.Add(new BoxRegion((BoxCollider)collider));
                     regions[regions.Count - 1].index = regions.Count - 1;
                     continue;
@@ -260,7 +262,7 @@ namespace BaseAI
                 if (collider.GetType() == typeof(SphereCollider))
                 {
                     regions.Add(new SphereRegion((SphereCollider)collider));
-                    regions[regions.Count - 1].index = regions.Count - 1; 
+                    regions[^1].index = regions.Count - 1;
                     continue;
                 }
 
@@ -270,7 +272,7 @@ namespace BaseAI
             var platform = GameObject.FindObjectOfType<Platform1Movement>();
             regions.Add(platform);
 
-            for(int i = 0; i < regions.Count; ++i)
+            for (int i = 0; i < regions.Count; ++i)
                 Debug.Log("Region : " + i + " -> " + regions[i].GetCenter().ToString());
 
             //  Настраиваем связи между регионами - не самая лучшая идея, но для крупных регионов сойдёт
@@ -290,7 +292,7 @@ namespace BaseAI
 
             regions[5].Neighbors.Add(regions[7]);
             regions[5].Neighbors.Add(regions[9]);
-            
+
             regions[6].Neighbors.Add(regions[8]);
             regions[6].Neighbors.Add(regions[7]);
 
@@ -301,7 +303,7 @@ namespace BaseAI
 
             regions[9].Neighbors.Add(regions[3]);
             regions[9].Neighbors.Add(regions[5]);
-            //  Платформы потом. Для них реализовать класс "BaseRegion", и его подсовывать в этот список, обновляя 
+            //  Платформы потом. Для них реализовать класс "BaseRegion", и его подсовывать в этот список, обновляя
             //  списки смежности
         }
 
@@ -322,7 +324,7 @@ namespace BaseAI
 
         public bool IsInRegion(PathNode node, int RegionIndex)
         {
-            return RegionIndex>=0 && RegionIndex < regions.Count && regions[RegionIndex].Contains(node);
+            return RegionIndex >= 0 && RegionIndex < regions.Count && regions[RegionIndex].Contains(node);
         }
     }
 }

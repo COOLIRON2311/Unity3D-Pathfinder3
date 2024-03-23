@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class spin : MonoBehaviour
+public class Spin : MonoBehaviour
 {
 
     public float sensitivityVert = 9.0f;

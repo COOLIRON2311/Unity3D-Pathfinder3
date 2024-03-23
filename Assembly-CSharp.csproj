@@ -55,13 +55,13 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.12f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\spin_body.cs" />
     <Compile Include="Assets\Scripts\AI\MovementProperties.cs" />
     <Compile Include="Assets\Scripts\AI\PriorQueue\GenericPriorityQueueNode.cs" />
-    <Compile Include="Assets\Scripts\keyBoardControl.cs" />
+    <Compile Include="Assets\Scripts\KeyBoardControl.cs" />
     <Compile Include="Assets\Scripts\BotMovement.cs" />
-    <Compile Include="Assets\Scripts\spin.cs" />
+    <Compile Include="Assets\Scripts\SpinBody.cs" />
     <Compile Include="Assets\Scripts\AI\PriorQueue\GenericPriorityQueue.cs" />
+    <Compile Include="Assets\Scripts\Spin.cs" />
     <Compile Include="Assets\Scripts\AI\PriorQueue\IFixedSizePriorityQueue.cs" />
     <Compile Include="Assets\Scripts\GetUp.cs" />
     <Compile Include="Assets\Scripts\AI\PriorQueue\IPriorityQueue.cs" />

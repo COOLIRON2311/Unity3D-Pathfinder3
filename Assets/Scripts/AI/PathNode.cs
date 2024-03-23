@@ -5,17 +5,17 @@ using UnityEngine;
 namespace BaseAI
 {
     /// <summary>
-    /// Точка пути - изменяем по сравенению с предыдущим проектом
+    /// Точка пути - изменяем по сравнению с предыдущим проектом
     /// </summary>
     public class PathNode//: MonoBehaviour
     {
         public Vector3 Position { get; set; }         //  Позиция в глобальных координатах
         public Vector3 Direction { get; set; }        //  Направление
-        public float TimeMoment { get; set; }         //  Момент времени       
+        public float TimeMoment { get; set; }         //  Момент времени
         /// <summary>
         /// Нужно ли из этой вершины прыгать
         /// </summary>
-        public bool JumpNode { get; set; } = false; 
+        public bool JumpNode { get; set; } = false;
         /// <summary>
         /// Родительская вершина - предшествующая текущей в пути от начальной к целевой
         /// </summary>
@@ -27,7 +27,7 @@ namespace BaseAI
         /// Предположительный индекс региона, в котором находится точка. Проблема в том, что регионы могут накладываться
         /// друг на друга, и этот индекс может не соответствовать тому, который нам нужен
         /// </summary>
-        public int RegionIndex = -1;  
+        public int RegionIndex = -1;
 
         /// <summary>
         /// Конструирование вершины на основе родительской (если она указана)
@@ -80,14 +80,15 @@ namespace BaseAI
         /// </summary>
         /// <param name="stepLength">Длина шага</param>
         /// <param name="rotationAngle">Угол поворота вокруг оси OY в градусах</param>
-        /// <param name="timeDelta">Впремя, потраченное на шаг</param>
+        /// <param name="timeDelta">Время, потраченное на шаг</param>
         /// <returns></returns>
         public PathNode SpawnChild(float stepLength, float rotationAngle, float timeDelta)
         {
-            PathNode result = new PathNode(this);
-
-            //  Вращаем вокруг вертикальной оси, что в принципе не очень хорошо - надо бы более универсально, нормаль к поверхности взять, и всё такое
-            result.Direction = Quaternion.AngleAxis(rotationAngle, Vector3.up) * Direction;
+            PathNode result = new(this)
+            {
+                //  Вращаем вокруг вертикальной оси, что в принципе не очень хорошо - надо бы более универсально, нормаль к поверхности взять, и всё такое
+                Direction = Quaternion.AngleAxis(rotationAngle, Vector3.up) * Direction
+            };
             result.Direction.Normalize();
 
             //  Перемещаемся в новую позицию
@@ -95,7 +96,7 @@ namespace BaseAI
 
             //  Момент времени считаем
             result.TimeMoment = TimeMoment + timeDelta;
-            
+
             result.RegionIndex = RegionIndex;
 
             //  Добавка для эвристики - нужна ли?
@@ -116,26 +117,27 @@ namespace BaseAI
 
         public PathNode SpawnJumpForward(MovementProperties mp)
         {
-            PathNode result = new PathNode(this);
+            PathNode result = new(this)
+            {
+                Direction = Direction,
 
-            result.Direction = Direction;
+                //  Перемещаемся в новую позицию
+                Position = Position + Direction * mp.jumpLength,
 
-            //  Перемещаемся в новую позицию
-            result.Position = Position + Direction * mp.jumpLength;
+                //  Момент времени считаем
+                TimeMoment = TimeMoment + mp.jumpTime,
 
-            //  Момент времени считаем
-            result.TimeMoment = TimeMoment + mp.jumpTime;
+                //  Индекс региона должен быть пересчитан
+                RegionIndex = -1,
 
-            //  Индекс региона должен быть пересчитан
-            result.RegionIndex = -1;
-
-            result.JumpNode = true;
+                JumpNode = true
+            };
 
             return result;
         }
 
         /// <summary>
-        /// Дискретизация положения точки к неторому узлу пространственной сетки.
+        /// Дискретизация положения точки к некоторому узлу пространственной сетки.
         /// Используется для того, чтобы контролировать какие точки мы уже посещали, в коллекциях типа HashSet
         /// Поворот не учитывается, что вообще-то не очень хорошо
         /// </summary>
