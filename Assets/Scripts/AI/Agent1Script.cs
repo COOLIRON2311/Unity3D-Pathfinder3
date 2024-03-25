@@ -46,11 +46,13 @@ public class AgentScript : MonoBehaviour
             Vector3 target = path.Dequeue();
             NavMeshPath navMeshPath = new();
 
+            // Wait until the nest MeshPath is available
             while (!(agent.CalculatePath(target, navMeshPath) && navMeshPath.status == NavMeshPathStatus.PathComplete))
                 yield return new WaitForFixedUpdate();
 
             agent.SetPath(navMeshPath);
 
+            // Do nothing while the agent is moving to the target point
             while (agent.remainingDistance > threshold)
                 yield return new WaitForFixedUpdate();
         }
@@ -60,28 +62,41 @@ public class AgentScript : MonoBehaviour
 
     void TryGoToTarget(Vector3 target)
     {
+        // I sincerely want to see the bastard who thought that
+        // you shouldn't be able to specify target mesh when calling
+        // NavMesh.SamplePosition. Unfortunately, this is the case, so
+        // we'll have to work around it with CalculatePath and path.status
+
         var owner = agent.navMeshOwner as Component;
         owner.TryGetComponent(out AreaScript ownerArea);
 
+        // Index of the NavMesh which the agent is currently on
         int currentArea = ownerArea.areaIndex;
         NavMeshPath path = new();
+
+        // If we are in the same area as target point, then just move to it
         if (agent.CalculatePath(target, path) && path.status == NavMeshPathStatus.PathComplete)
             agent.SetPath(path);
         else
         {
             foreach (var area in AreaScript.areas.Values)
             {
+                // We'll need a point which is certainly on the mesh
                 Vector3 pointInArea = area.neighbors[0].From;
-                // Check if target is in this area
+
+                // Check if target is in the area
                 NavMesh.CalculatePath(pointInArea, target, NavMesh.AllAreas, path);
 
+                // Target point is not in this area, skip
                 if (path.status == NavMeshPathStatus.PathInvalid)
                     continue;
 
+                // We have found the index of the area, on which the target point is located
                 var pathToTarget = AreaScript.FindPath(currentArea, area.areaIndex);
                 if (pathToTarget.Count == 0)
                     continue;
 
+                // Add the last point of the path (target)
                 pathToTarget.Enqueue(target);
 
                 if (walking != null)
