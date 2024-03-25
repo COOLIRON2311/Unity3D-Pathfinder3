@@ -55,26 +55,12 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.12f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\AI\MovementProperties.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\GenericPriorityQueueNode.cs" />
-    <Compile Include="Assets\Scripts\KeyBoardControl.cs" />
-    <Compile Include="Assets\Scripts\BotMovement.cs" />
-    <Compile Include="Assets\Scripts\SpinBody.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\GenericPriorityQueue.cs" />
-    <Compile Include="Assets\Scripts\Spin.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\IFixedSizePriorityQueue.cs" />
-    <Compile Include="Assets\Scripts\GetUp.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\IPriorityQueue.cs" />
-    <Compile Include="Assets\SuicideBullet.cs" />
-    <Compile Include="Assets\Scripts\Platforms\Platform1Movement.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\SimplePriorityQueue.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\FastPriorityQueue.cs" />
-    <Compile Include="Assets\Scripts\AI\PathFinder.cs" />
-    <Compile Include="Assets\Scripts\AI\PathNode.cs" />
-    <Compile Include="Assets\Scripts\TankShooting.cs" />
+    <Compile Include="Assets\Scripts\PlatformScript.cs" />
+    <Compile Include="Assets\Scripts\AI\Agent1Script.cs" />
+    <Compile Include="Assets\Scripts\AI\AreaScript.cs" />
+    <Compile Include="Assets\Scripts\CameraScript.cs" />
+    <Compile Include="Assets\Scripts\AI\Graph.cs" />
     <Compile Include="Assets\Scripts\FlyCamera.cs" />
-    <Compile Include="Assets\Scripts\AI\Сartographer.cs" />
-    <Compile Include="Assets\Scripts\AI\PriorQueue\FastPriorityQueueNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
