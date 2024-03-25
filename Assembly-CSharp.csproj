@@ -60,7 +60,6 @@
     <Compile Include="Assets\Scripts\AI\AreaScript.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
     <Compile Include="Assets\Scripts\AI\Graph.cs" />
-    <Compile Include="Assets\Scripts\FlyCamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
