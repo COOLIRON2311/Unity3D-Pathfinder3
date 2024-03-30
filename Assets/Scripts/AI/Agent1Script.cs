@@ -11,7 +11,8 @@ public class AgentScript : MonoBehaviour
     private Coroutine walking;
     private readonly float threshold = 5.0f;
 
-    private void Awake() {
+    private void Awake()
+    {
         agent = GetComponent<NavMeshAgent>();
     }
 

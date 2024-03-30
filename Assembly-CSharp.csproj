@@ -58,6 +58,8 @@
     <Compile Include="Assets\Scripts\PlatformScript.cs" />
     <Compile Include="Assets\Scripts\AI\Agent1Script.cs" />
     <Compile Include="Assets\Scripts\AI\AreaScript.cs" />
+    <Compile Include="Assets\Scripts\AI\Agent2Script.cs" />
+    <Compile Include="Assets\Scripts\DynamicObstacleScript.cs" />
     <Compile Include="Assets\Scripts\CameraScript.cs" />
     <Compile Include="Assets\Scripts\AI\Graph.cs" />
   </ItemGroup>
